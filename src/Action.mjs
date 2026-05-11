@@ -43,6 +43,9 @@ export default class Action{
     if(!response.ok){
       return(false);
     }
+    if(response.status === 404){
+      return(false);
+    }
     return(true);
   }
 }
