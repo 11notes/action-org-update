@@ -31108,7 +31108,7 @@ class Eleven{
     exportVariable(n, `${v}`);
   }
 
-  static getInputs(v){
+  static getInput(v){
     return(getInput(v) || null);
   }
 
