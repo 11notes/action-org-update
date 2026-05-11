@@ -31199,14 +31199,15 @@ class Action{
   };
   #json = {};
 
-  inputs = {image:Action_Eleven.getInput('image'), latest:Action_Eleven.getInput('latest')};
+  inputs = {latest:Action_Eleven.getInput('latest')};
 
   constructor(){
     Action_Eleven.info('class Action initialized', this.inputs);
+    Action_Eleven.exportVariable('ORG_UPDATE', false);
   }
 
   async run(){
-    const current = this.#getCurrentVersion();
+    this.#getCurrentVersion();
     Action_Eleven.info(`latest version is: ${this.inputs.latest}`);
     if(await this.#latestTagExists()){
       Action_Eleven.warning(`latest version exists already as a tag`);
@@ -31233,7 +31234,7 @@ class Action{
   }
 
   async #latestTagExists(){
-    const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
+    const response = await fetch(`https://hub.docker.com/v2/repositories/${this.#json.image}/tags/${this.inputs.latest}`);
     Action_Eleven.info(`checking if latest version exists as a tag: ${response.ok}`);
     return(response.ok);
   }

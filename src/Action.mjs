@@ -10,14 +10,15 @@ export default class Action{
   };
   #json = {};
 
-  inputs = {image:Eleven.getInput('image'), latest:Eleven.getInput('latest')};
+  inputs = {latest:Eleven.getInput('latest')};
 
   constructor(){
     Eleven.info('class Action initialized', this.inputs);
+    Eleven.exportVariable('ORG_UPDATE', false);
   }
 
   async run(){
-    const current = this.#getCurrentVersion();
+    this.#getCurrentVersion();
     Eleven.info(`latest version is: ${this.inputs.latest}`);
     if(await this.#latestTagExists()){
       Eleven.warning(`latest version exists already as a tag`);
@@ -44,7 +45,7 @@ export default class Action{
   }
 
   async #latestTagExists(){
-    const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
+    const response = await fetch(`https://hub.docker.com/v2/repositories/${this.#json.image}/tags/${this.inputs.latest}`);
     Eleven.info(`checking if latest version exists as a tag: ${response.ok}`);
     return(response.ok);
   }
