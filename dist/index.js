@@ -31208,8 +31208,8 @@ class Action{
   async run(){
     const current = this.#getCurrentVersion();
     Action_Eleven.info(`latest version is: ${this.inputs.latest}`);
-    if(this.#latestTagExists()){
-      Action_Eleven.warning(`latest version ${this.inputs.latest} exists already as a tag`);
+    if(await this.#latestTagExists()){
+      Action_Eleven.warning(`latest version exists already as a tag`);
     }else{
       if(current !== this.inputs.latest){
         Action_Eleven.info(`latest version does not exist as a tag yet`);
@@ -31238,7 +31238,7 @@ class Action{
 
   async #latestTagExists(){
     const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
-    Action_Eleven.info(`checking if latest version (${this.inputs.latest}) exists as a tag: ${response.ok}`);
+    Action_Eleven.info(`checking if latest version exists as a tag: ${response.ok}`);
     return(response.ok);
   }
 }

@@ -20,7 +20,7 @@ export default class Action{
     const current = this.#getCurrentVersion();
     Eleven.info(`latest version is: ${this.inputs.latest}`);
     if(await this.#latestTagExists()){
-      Eleven.warning(`latest version ${this.inputs.latest} exists already as a tag`);
+      Eleven.warning(`latest version exists already as a tag`);
     }else{
       if(current !== this.inputs.latest){
         Eleven.info(`latest version does not exist as a tag yet`);
@@ -49,7 +49,7 @@ export default class Action{
 
   async #latestTagExists(){
     const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
-    Eleven.info(`checking if latest version (${this.inputs.latest}) exists as a tag: ${response.ok}`);
+    Eleven.info(`checking if latest version exists as a tag: ${response.ok}`);
     return(response.ok);
   }
 }
