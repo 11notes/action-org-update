@@ -1,6 +1,6 @@
 name: 'action-org-update'
 author: '11notes'
-description: 'This action will check if a container image needs and update or not, based on current, public and latest semver from different sources.'
+description: 'This action will check if a container image needs and update'
 branding:
   icon: 'book-open'
   color: 'blue'
