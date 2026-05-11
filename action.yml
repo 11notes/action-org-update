@@ -1,0 +1,16 @@
+name: 'action-org-update'
+author: '11notes'
+description: 'This action will check if a container image needs and update or not, based on current, public and latest semver from different sources.'
+branding:
+  icon: 'book-open'
+  color: 'blue'
+inputs:
+  image: 
+    description: 'image name'
+    required: true
+  latest:
+    description: 'latest semver of app'
+    required: true
+runs:
+  using: 'node24'
+  main: 'dist/index.js'

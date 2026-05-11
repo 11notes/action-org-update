@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "ncc build index.js -o dist --license licenses.txt --no-cache --target es2022"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0",
+    "semver": "^7.8.0"
+  }
+}
