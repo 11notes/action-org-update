@@ -31207,11 +31207,12 @@ class Action{
 
   async run(){
     const current = this.#getCurrentVersion();
+    Action_Eleven.info(`latest version is: ${this.inputs.latest}`);
     if(this.#latestTagExists()){
       Action_Eleven.warning(`latest version ${this.inputs.latest} exists already as a tag`);
     }else{
       if(current !== this.inputs.latest){
-        Action_Eleven.info(`latest version is ${this.inputs.latest}`);
+        Action_Eleven.info(`latest version does not exist as a tag yet`);
         Action_Eleven.exportVariable('ORG_UPDATE', true);
         Action_Eleven.exportVariable('ORG_UPDATE_BASE64JSON', external_node_buffer_.from(JSON.stringify({
           version:this.inputs.latest,
@@ -31228,7 +31229,7 @@ class Action{
   #getCurrentVersion(){
     try{
       this.#json = JSON.parse((0,external_node_fs_namespaceObject.readFileSync)(this.#etc.json).toString());
-      Action_Eleven.info(`current version is ${this.#json.semver.version}`);
+      Action_Eleven.info(`current version is: ${this.#json.semver.version}`);
       return(this.#json.semver.version);
     }catch(e){
       throw new Error(`could not read/parse ${this.#etc.json}`);
@@ -31237,10 +31238,8 @@ class Action{
 
   async #latestTagExists(){
     const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
-    if(!response.ok){
-      return(false);
-    }
-    return(true);
+    Action_Eleven.info(`checking if latest version (${this.inputs.latest}) exists as a tag: ${response.ok}`);
+    return(response.ok);
   }
 }
 ;// CONCATENATED MODULE: ./index.js

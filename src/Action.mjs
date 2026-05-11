@@ -18,11 +18,12 @@ export default class Action{
 
   async run(){
     const current = this.#getCurrentVersion();
+    Eleven.info(`latest version is: ${this.inputs.latest}`);
     if(this.#latestTagExists()){
       Eleven.warning(`latest version ${this.inputs.latest} exists already as a tag`);
     }else{
       if(current !== this.inputs.latest){
-        Eleven.info(`latest version is ${this.inputs.latest}`);
+        Eleven.info(`latest version does not exist as a tag yet`);
         Eleven.exportVariable('ORG_UPDATE', true);
         Eleven.exportVariable('ORG_UPDATE_BASE64JSON', Buffer.from(JSON.stringify({
           version:this.inputs.latest,
@@ -39,7 +40,7 @@ export default class Action{
   #getCurrentVersion(){
     try{
       this.#json = JSON.parse(readFileSync(this.#etc.json).toString());
-      Eleven.info(`current version is ${this.#json.semver.version}`);
+      Eleven.info(`current version is: ${this.#json.semver.version}`);
       return(this.#json.semver.version);
     }catch(e){
       throw new Error(`could not read/parse ${this.#etc.json}`);
@@ -48,9 +49,7 @@ export default class Action{
 
   async #latestTagExists(){
     const response = await fetch(`https://hub.docker.com/v2/repositories/${this.inputs.image}/tags/${this.inputs.latest}`);
-    if(!response.ok){
-      return(false);
-    }
-    return(true);
+    Eleven.info(`checking if latest version (${this.inputs.latest}) exists as a tag: ${response.ok}`);
+    return(response.ok);
   }
 }
