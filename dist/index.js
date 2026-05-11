@@ -31213,13 +31213,10 @@ class Action{
     }else{
       if(current !== this.inputs.latest){
         Action_Eleven.info(`latest version does not exist as a tag yet`);
-        const commit = await Action_Eleven.exec('git', ['rev-list', '--tags', '--max-count=1']);
-        const tag = await Action_Eleven.exec('git', ['describe', '--abbrev=0', '--tags', commit]);
-        Action_Eleven.info('git tag info:', {commit:commit, tag:tag});
         Action_Eleven.exportVariable('ORG_UPDATE', true);
-        Action_Eleven.exportVariable('ORG_UPDATE_BASE64JSON', external_node_buffer_.from(JSON.stringify({
+        Action_Eleven.exportVariable('ORG_UPDATE_BASE64JSON', external_node_buffer_.Buffer.from(JSON.stringify({
           version:this.inputs.latest,
-          tag:`${tag}`.replace('v', ''),
+          tag:`${await Action_Eleven.exec('git', ['describe', '--abbrev=0', '--tags', await Action_Eleven.exec('git', ['rev-list', '--tags', '--max-count=1'])])}`.replace('v', ''),
           unraid:this.#json?.unraid || false,
           nobody:this.#json?.nobody || false,
         })).toString('base64'));
