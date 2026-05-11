@@ -3,10 +3,6 @@ This action will check if a container image needs and update.
 
 ## Inputs
 
-### `image`
-
-Image to check
-
 ### `latest`
 
 Latest version found
@@ -24,7 +20,6 @@ Latest version found
   if: env.LATEST_VERSION != 'null' && env.LATEST_VERSION != ''
   uses: 11notes/action-org-update@v1
   with:
-    image: '11notes/go'
     latest: ${{ env.LATEST_VERSION }}
 
 - name: call org.update
