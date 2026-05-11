@@ -19,7 +19,7 @@ export default class Action{
   async run(){
     const current = this.#getCurrentVersion();
     Eleven.info(`latest version is: ${this.inputs.latest}`);
-    if(this.#latestTagExists()){
+    if(await this.#latestTagExists()){
       Eleven.warning(`latest version ${this.inputs.latest} exists already as a tag`);
     }else{
       if(current !== this.inputs.latest){
