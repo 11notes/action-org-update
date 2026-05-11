@@ -30608,14 +30608,14 @@ var exec_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
  */
 function exec_exec(commandLine, args, options) {
     return exec_awaiter(this, void 0, void 0, function* () {
-        const commandArgs = tr.argStringToArray(commandLine);
+        const commandArgs = argStringToArray(commandLine);
         if (commandArgs.length === 0) {
             throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
         }
         // Path to tool to execute should be first arg
         const toolPath = commandArgs[0];
         args = commandArgs.slice(1).concat(args || []);
-        const runner = new tr.ToolRunner(toolPath, args, options);
+        const runner = new ToolRunner(toolPath, args, options);
         return runner.exec();
     });
 }
@@ -31051,6 +31051,7 @@ function getIDToken(aud) {
 
 
 
+
 class Eleven{
   static #instance = null;
   static arguments = [];
@@ -31112,6 +31113,37 @@ class Eleven{
     return(getInput(v) || null);
   }
 
+  static async exec(bin, arg=[], stripCRLF=true){
+    let stdout = '';
+    let stderr = '';
+
+    const options = {
+      listeners:{
+        stdout:(data) => {
+          stdout += data.toString();
+        },
+        stderr:(data) => {
+          stderr += data.toString();
+        }
+      }
+    };
+
+    try{
+      await exec_exec(bin, arg, options);
+    }catch(e){
+      Eleven.warning(`exec [${bin}] exception: ${e}`);
+      return(false);
+    }
+    if(stderr.length > 0){
+      Eleven.warning(`exec [${bin}] exited with error: ${stderr}`);
+      return(false);
+    }
+    if(stripCRLF){
+      stdout = stdout.replace(/[\r\n]*/g, '');
+    }
+    return(stdout);
+  }
+
   static getEleven(){
     if(!Eleven.#instance){
       Eleven.arguments = process.argv.slice(2);
@@ -31152,7 +31184,10 @@ class Eleven{
 /* harmony default export */ const src_Eleven = (Eleven.getEleven);
 ;// CONCATENATED MODULE: external "node:fs"
 const external_node_fs_namespaceObject = require("node:fs");
+// EXTERNAL MODULE: external "node:buffer"
+var external_node_buffer_ = __nccwpck_require__(4573);
 ;// CONCATENATED MODULE: ./src/Action.mjs
+
 
 
 
@@ -31162,6 +31197,7 @@ class Action{
   #etc = {
     json:'./.json',
   };
+  #json = {};
 
   inputs = {image:Action_Eleven.getInput('image'), latest:Action_Eleven.getInput('latest')};
 
@@ -31177,6 +31213,12 @@ class Action{
       if(current !== this.inputs.latest){
         Action_Eleven.info(`latest version is ${this.inputs.latest}`);
         Action_Eleven.exportVariable('ORG_UPDATE', true);
+        Action_Eleven.exportVariable('ORG_UPDATE_BASE64JSON', external_node_buffer_.from(JSON.stringify({
+          version:this.inputs.latest,
+          tag:await Action_Eleven.exec('git', ['describe', '--abbrev=0', '--tags', await Action_Eleven.exec('git', ['rev-list', '--tags', '--max-count=1'])]).replace('v', ''),
+          unraid:this.#json?.unraid || false,
+          nobody:this.#json?.nobody || false,
+        })).toString('base64'));
       }else{
         Action_Eleven.warning(`latest version and current version are the same!`);
       }
@@ -31185,9 +31227,9 @@ class Action{
 
   #getCurrentVersion(){
     try{
-      const json = JSON.parse((0,external_node_fs_namespaceObject.readFileSync)(this.#etc.json).toString());
-      Action_Eleven.info(`current version is ${json.semver.version}`);
-      return(json.semver.version);
+      this.#json = JSON.parse((0,external_node_fs_namespaceObject.readFileSync)(this.#etc.json).toString());
+      Action_Eleven.info(`current version is ${this.#json.semver.version}`);
+      return(this.#json.semver.version);
     }catch(e){
       throw new Error(`could not read/parse ${this.#etc.json}`);
     }

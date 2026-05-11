@@ -1,5 +1,6 @@
 import { inspect } from 'node:util';
 import * as core from '@actions/core';
+import * as _exec from '@actions/exec';
 
 class Eleven{
   static #instance = null;
@@ -60,6 +61,37 @@ class Eleven{
 
   static getInput(v){
     return(core.getInput(v) || null);
+  }
+
+  static async exec(bin, arg=[], stripCRLF=true){
+    let stdout = '';
+    let stderr = '';
+
+    const options = {
+      listeners:{
+        stdout:(data) => {
+          stdout += data.toString();
+        },
+        stderr:(data) => {
+          stderr += data.toString();
+        }
+      }
+    };
+
+    try{
+      await _exec.exec(bin, arg, options);
+    }catch(e){
+      Eleven.warning(`exec [${bin}] exception: ${e}`);
+      return(false);
+    }
+    if(stderr.length > 0){
+      Eleven.warning(`exec [${bin}] exited with error: ${stderr}`);
+      return(false);
+    }
+    if(stripCRLF){
+      stdout = stdout.replace(/[\r\n]*/g, '');
+    }
+    return(stdout);
   }
 
   static getEleven(){

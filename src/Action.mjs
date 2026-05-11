@@ -1,5 +1,6 @@
 import getEleven from './Eleven.mjs';
 import { readFileSync } from 'node:fs';
+import Buffer from 'node:buffer';
 
 const Eleven = getEleven();
 
@@ -7,6 +8,7 @@ export default class Action{
   #etc = {
     json:'./.json',
   };
+  #json = {};
 
   inputs = {image:Eleven.getInput('image'), latest:Eleven.getInput('latest')};
 
@@ -22,6 +24,12 @@ export default class Action{
       if(current !== this.inputs.latest){
         Eleven.info(`latest version is ${this.inputs.latest}`);
         Eleven.exportVariable('ORG_UPDATE', true);
+        Eleven.exportVariable('ORG_UPDATE_BASE64JSON', Buffer.from(JSON.stringify({
+          version:this.inputs.latest,
+          tag:await Eleven.exec('git', ['describe', '--abbrev=0', '--tags', await Eleven.exec('git', ['rev-list', '--tags', '--max-count=1'])]).replace('v', ''),
+          unraid:this.#json?.unraid || false,
+          nobody:this.#json?.nobody || false,
+        })).toString('base64'));
       }else{
         Eleven.warning(`latest version and current version are the same!`);
       }
@@ -30,9 +38,9 @@ export default class Action{
 
   #getCurrentVersion(){
     try{
-      const json = JSON.parse(readFileSync(this.#etc.json).toString());
-      Eleven.info(`current version is ${json.semver.version}`);
-      return(json.semver.version);
+      this.#json = JSON.parse(readFileSync(this.#etc.json).toString());
+      Eleven.info(`current version is ${this.#json.semver.version}`);
+      return(this.#json.semver.version);
     }catch(e){
       throw new Error(`could not read/parse ${this.#etc.json}`);
     }
