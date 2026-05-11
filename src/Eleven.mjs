@@ -58,7 +58,7 @@ class Eleven{
     core.exportVariable(n, `${v}`);
   }
 
-  static getInputs(v){
+  static getInput(v){
     return(core.getInput(v) || null);
   }
 
